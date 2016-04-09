@@ -135,10 +135,10 @@ name=constrName)
 myModel.update()
 
 #constraint 6: Exactly 1 Thursday game every week upto week 16, week 17 has no thursday games
-Thursdays = ['THUN_NBC' , 'THUN_NFL' , 'THUN_NFL' , 'THUE_FOX' ,'THUL_CBS', 'THUN_NBC' , 'THUN_CBS'  ]
+Thursday = ['THUN_NBC' , 'THUN_NFL' , 'THUN_NFL' , 'THUE_FOX' ,'THUL_CBS', 'THUN_NBC' , 'THUN_CBS'  ]
 for w in range(1,17):
     for s in S[w]:
-        if s in Thursdays:
+        if s in Thursday:
             constrName='6_one_Thursady_in_w%s' %(w)
             myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] ) ==1 ,name=constrName)
 myModel.update()
@@ -246,80 +246,21 @@ myModel.update()
 for h in H:
     if h!= 'DEN':
         for s in S[1]:
-                if s not in Thursdays:
+                if s not in Thursday:
                     for a in H[h]:
                         myModel.remove(myGames[a,h,s,1])
                         del myGames[a,h,s,1]
 myModel.update
 
-# To be edited
-# Constraint 17:
-#for h in H:
-#    if h!='DAL' or h!='DET':
-#        for s in S[12]:
-#            if (s!='THUE_CBS' and h!='DET') or (s!='THUL_FOX' and h!='DAL'):
-#                for a in H[h]:
-#                    myModel.remove(myGames[a,h,s,11])
-#                    del myGames[a,h,s,11]
-#myModel.update
-
-# Constraint 21:
-for s in ['SUNE_CBS','SUNE_FOX']:
-    constrName='Atleast_3_EGames_Sun'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,18)) >= 3, name=constrName)
-myModel.update()
-
-# Constraint 22:
-# Create Sunday list.
-# if Type Error or unhashable, check slots list syntax
-Sundays
-for chnl in ['FOX','CBS']:
-    constrName='Atleast_5_Sun_Games'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,18) for s in S[w] if s[:3]=='SUN' and s[len(s)-3:]==chnl) >= 5, name=constrName)
-myModel.update()
-
-#Constraint 23:
-for chnl in ['FOX','CBS']:
-    constrName='FOX&CBS_Get_8_DH'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,17) for s in S[w] if s=='SUNDH_'+chnl) == 8, name=constrName)
-myModel.update()
-
-# Constraint 24:
-for chnl in ['FOX','CBS']:
-    constrName='1_DH_each_in_17'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,17] for h in T for a in H[h] for s in S[17] if s[len(s)-3:]==chnl and s[3:5]=='DH') == 1, name=constrName)
-
-# Constraint 25:
-for i in range (1,17):    
-    for chnl in ['FOX','CBS']:
-        constrName='2_DH_in_row'
-        myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(i,i+2) for s in S[w] if s[len(s)-3:]==chnl and s[3:5]=='DH') < 2, name=constrName)
-
-# Constraint 26:  
-for h in T:
-    constrName='PrimeTime<=5'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for a in H[h] for w in range(1,18) for s in S[w] if s[4:5] == 'N' and w!= 12)  <= 5 , name=constrName)
-
-#Constraint 27 :
-constrName='NBC<4'
-myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,18) for s in S[w] if s[len(s)-3:] == 'NBC')  <= 4 , name=constrName)
-
-#Constrint 28
-for h in T:
-    for w in range (1,17):
-        for next_week_slots in S[w+1]:
-            if next_week_slots =='SUNI_NFL':
-                constrName='Home_Before_Int'
-                myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for a in H[h] for s in S[w])  == 1 , name=constrName)
-#Constraint 29
-for h in T:
-    for w in range (1,17):
-        for this_week_slots in S[w]:
-            if this_week_slots =='SUNI_NFL':
-                constrName='Bye_After_Int'
-                myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w+1] for a in H[h] for s in S[w] if s == 'SUNB_NFL' )  == 1 , name=constrName)
-
-# for constraint 28 and 29; possibly change (cuz indian squirrel says so) to computaionaly less expansive methods.           
+#Constraint 17:
+for h in H:
+    if h!='DAL' or h!='DET':
+        for s in S[11]:
+            if (s!='SUNE_CBS' and h!='DET') or (s!='SUNL_FOX' and h!='DAL'):
+                for a in H[h]:
+                    myModel.remove(myGames[a,h,s,11])
+                    del myGames[a,h,s,11]
+myModel.update
 
 myModel.setParam('MIPFocus',1)
 myModel.optimize()

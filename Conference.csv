@@ -1,0 +1,33 @@
+Conference,Division,Team,City,Stadium
+AFC,East,BUF,"Orchard Park,_NY",Ralph Wilson Stadium
+AFC,East,MIA,"Miami Gardens,_FL",Sun Life Stadium
+AFC,East,NE,"Foxborough,_MA",Gillette Stadium
+AFC,East,NYJ,"East Rutherford,_NJ",MetLife Stadium
+AFC,North,BAL,"Baltimore,_MD",M&T Bank Stadium
+AFC,North,CIN,"Cincinnati,_OH",Paul Brown Stadium
+AFC,North,CLE,"Cleveland,_OH",FirstEnergy Stadium
+AFC,North,PIT,"Pittsburgh,_PA",Heinz Field
+AFC,South,HOU,"Houston,_TX",NRG Stadium
+AFC,South,IND,"Indianapolis,_IN",Lucas Oil Stadium
+AFC,South,JAC,"Jacksonville,_FL",EverBank Field
+AFC,South,TEN,"Nashville,_TN",Nissan Stadium
+AFC,West,DEN,"Denver,_CO",Sports Authority Field at Mile High
+AFC,West,KC,"Kansas City,_MO",Arrowhead Stadium
+AFC,West,OAK,"Oakland,_CA",O.co Coliseum
+AFC,West,SD,"San Diego,_CA",Qualcomm Stadium
+NFC,East,DAL,"Arlington,_TX",AT&T Stadium
+NFC,East,NYG,"East Rutherford,_NJ",MetLife Stadium
+NFC,East,PHI,"Philadelphia,_PA",Lincoln Financial Field
+NFC,East,WAS,"Landover,_MD",FedExField
+NFC,North,CHI,"Chicago,_IL",Soldier Field
+NFC,North,DET,"Detroit,_MI",Ford Field
+NFC,North,GB,"Green Bay,_WI",Lambeau Field
+NFC,North,MIN,"Minneapolis,_MN",U.S. Bank Stadium
+NFC,South,ATL,"Atlanta,_GA",Georgia Dome
+NFC,South,CAR,"Charlotte,_NC",Bank of America Stadium
+NFC,South,NO,"New Orleans,_LA",Mercedes-Benz Superdome
+NFC,South,TB,"Tampa,_FL",Raymond James Stadium
+NFC,West,ARZ,"Glendale,_AZ",University of Phoenix Stadium
+NFC,West,STL,"Los Angeles,_CA",Los Angeles Memorial Coliseum
+NFC,West,SF,"Santa Clara,_CA",Levi's Stadium
+NFC,West,SEA,"Seattle,_WA",CenturyLink Field
