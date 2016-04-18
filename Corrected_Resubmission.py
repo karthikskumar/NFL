@@ -256,124 +256,12 @@ for w in range(1,13):
         constrName ='at_least_2games_per6weeks_w%s_at_a%s' %(w,a)
         myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+6) for s in S[w1]) >= 2, name = constrName)
 myModel.update()
-
 #constraint 15: Each team must play at least 4 home/away games every 10 weeks
 for w in range(1,8): #adding 10 weeks goes beyond week 17
     for h in H:
         constrName ='at_least_4homeaway_every10weeks_w%s_h%s' %(w,h)
         myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for a in H[h] for w1 in range(w, w+11) for s in S[w1]) >= 4, name = constrName)
 myModel.update()
-
-#Constraint 16:Superbowl champion from 2015 opens the season at home on Thursday night of Week 1
-for h in H:
-    for a in H[h]:
-        for s in S[1]:
-                if s[:4] == "THUN" and h!= 'DEN':
-                        myModel.remove(myGames[a,h,s,1])
-                        del myGames[a,h,s,1]
-myModel.update
-
-
-#To be edited: Emad says: No , no need for editing.
-#Constraint 17: DAL and DET play at home on Thanksgiving day during the afternoon
-    # FOX gets DAL; CBS gets DET
-    # DET gets Early game, DAL gets Late game
-for h in H:
-    for a in H[h]:
-        for s in S[12]:
-            if any ([s=='THUE_CBS' and h!='DET' , s=='THUL_FOX' and h!='DAL'])  : 
-                myModel.remove(myGames[a,h,s,12])
-                del myGames[a,h,s,12]
-myModel.update
-
-#Constraint 18 is redundant. Cuz there is only 1 thursday night game played on both weeks and by default they are hosted on NBC
-#Constraint 18: NBC gets Thursday Night Games Week 1 and Week 12 (Thanksgiving)
-for h in H:
-    for a in H[h]:
-        for w in [1,12]:
-            for s in S[w]:
-                if (s [:4] == 'THUN') and (s[len(s)-3:] != 'NBC'): # If the slot is thursday night and the NBC is not hosting. Remove it.
-                        myModel.remove(myGames[a,h,s,w])
-                        del myGames[a,h,s,w]
-myModel.update       
-
-#Constraint 19 : CBS gets Thursday Night Games Weeks 2 though 9
-for h in H:
-    for a in H[h]:
-        for w in range (2,10):
-            for s in S[w]:
-                if (s[:4] == "THUN") and (s[len(s)-3:] != "CBS"): #If there is a THUN  game and not on CBS, remove it.
-                    myModel.remove(myGames[a,h,s,w])
-                    del myGames[a,h,s,w]
-myModel.update       
-              
-#Constraint 20: NFL gets Thursday Night Games Weeks 10, 11, 13-16 (and Saturday night games)
-for h in H:
-    for a in H[h]:
-        for w in [10, 11, 13,14,15,16]:
-            for s in S[w]:
-                if  any ([s[:4] == "THUN" , s[:4] =="SATN"]) and (s[len(s)-3:] != "NFL"):
-                    myModel.remove(myGames[a,h,s,w])
-                    del myGames[a,h,s,w]
-myModel.update   
-
-# Constraint 21:FOX/CBS each get at least 3 Early games on Sundays
-for s in ['SUNE_CBS','SUNE_FOX']:
-    constrName='Atleast_3_EGames_Sun'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,18)) >= 3, name=constrName)
-myModel.update()
-
-# Constraint 22:
-# Create Sunday list.
-# if Type Error or unhashable, check slots list syntax
-#Sundays
-for chnl in ['FOX','CBS']:
-    constrName='Atleast_5_Sun_Games'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,18) for s in S[w] if s[:3]=='SUN' and s[len(s)-3:]==chnl) >= 5, name=constrName)
-myModel.update()
-
-#Constraint 23:
-for chnl in ['FOX','CBS']:
-    constrName='FOX&CBS_Get_8_DH'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,17) for s in S[w] if s=='SUNDH_'+chnl) == 8, name=constrName)
-myModel.update()
-
-# Constraint 24:
-for chnl in ['FOX','CBS']:
-    constrName='1_DH_each_in_17'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,17] for h in T for a in H[h] for s in S[17] if s[len(s)-3:]==chnl and s[3:5]=='DH') == 1, name=constrName)
-
-# Constraint 25:
-for i in range (1,17):    
-    for chnl in ['FOX','CBS']:
-        constrName='2_DH_in_row'
-        myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(i,i+2) for s in S[w] if s[len(s)-3:]==chnl and s[3:5]=='DH') < 2, name=constrName)
-
-# Constraint 26:  
-for h in T:
-    constrName='PrimeTime<=5'
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for a in H[h] for w in range(1,18) for s in S[w] if s[4:5] == 'N' and w!= 12)  <= 5 , name=constrName)
-
-#Constraint 27 :
-constrName='NBC<4'
-myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in T for a in H[h] for w in range(1,18) for s in S[w] if s[len(s)-3:] == 'NBC')  <= 4 , name=constrName)
-
-#Constrint 28: Teams playing an international game will have a home game the week before their international game
-for h in T:
-    for w in range (1,17):
-        for next_week_slots in S[w+1]:
-            if next_week_slots =='SUNI_NFL':
-                constrName='Home_Before_Int'
-                myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for a in H[h] for s in S[w])  == 1 , name=constrName)
-                
-                
-#Constraint 29: Teams playing an international game will have their BYE game the week following the international game
-for h in T:
-    for w in range (1,17):
-        for this_week_slots in S[w]:
-            if this_week_slots =='SUNI_NFL':
-                constrName='Bye_After_Int'
-                myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w+1] for a in H[h] for s in S[w] if s == 'SUNB_NFL' )  == 1 , name=constrName)
 
 myModel.optimize()
 name="NFL_HW1"
