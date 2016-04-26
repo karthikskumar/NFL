@@ -338,3 +338,6 @@ Root relaxation: objective 2.560000e+02, 14683 iterations, 15.38 seconds
      0     0  256.00000    0  898          -  256.00000      -     -   63s
      0     0  256.00000    0  894          -  256.00000      -     -   81s
      0     0  256.00000    0  898          -  256.00000      -     -   82s
+
+Gurobi 6.5.0 (mac64) logging started Tue Apr 26 15:15:22 2016
+

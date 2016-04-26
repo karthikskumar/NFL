@@ -220,7 +220,8 @@ myModel.update()
 for w in range(1,15):
     for a in A:
        constrName ='no_more_than_4_consecutive_games_w%s_at_a%s' %(w,a)
-       myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+4) for s in S[w1]) <= 3, name = constrName)
+       myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+4) for s in S[w1]) +
+                                              quicksum(myGames[a,'BYE',s,w1] for w1 in range(w, w+4) for s in S[w1] if (a,'BYE',s,w1) in myGames) <= 3, name = constrName)
 myModel.update()
 
 #constraint 13a_Home_Games: No team plays 3 consecutive home/away games during the weeks 1, 2, 3, 4, 5 and 15, 16, 17 (treat a BYE game as an away game)
@@ -234,7 +235,8 @@ myModel.update()
 for w in range(1,4):
     for a in A:
         constrName ='no_more_than_4_consecutive_games_1_5_w%s_at_a%s' %(w,a)
-        myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+3) for s in S[w1]) <= 2, name = constrName) 
+        myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+3) for s in S[w1]) +
+                                               quicksum(myGames[a,'BYE',s,w1] for w1 in range(w, w+3) for s in S[w1] if (a,'BYE',s,w1) in myGames)<= 2, name = constrName) 
 myModel.update()
         
 #constraint 13b_Home_Games:
@@ -247,8 +249,8 @@ myModel.update()
 #constraint 13b_Away_Games:
 for a in A:
     constrName ='no_more_than_4_consecutive_games_15_18_w15_%s' %a
-    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in A[a] for w in range(15, 18) for s in S[w]) <= 2, name = constrName)
-    #need to add bye games
+    myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w] for h in A[a] for w in range(15, 18) for s in S[w]) +
+                                           quicksum(myGames[a,'BYE',s,w] for w in range(15, 18) for s in S[w] if (a,'BYE',s,w) in myGames)<= 2, name = constrName)
 myModel.update()
 
 #constraint 14_Home_Games: Each team must play at least 2 home/away games every 6 weeks
@@ -262,27 +264,83 @@ myModel.update()
 for w in range(1,13):
     for a in A:
         constrName ='at_least_2games_per6weeks_w%s_at_a%s' %(w,a)
-        myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+6) for s in S[w1]) >= 2, name = constrName)
+        myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+6) for s in S[w1]) +
+                                               quicksum(myGames[a,'BYE',s,w1] for w1 in range(w, w+6) for s in S[w1] if (a,'BYE',s,w1) in myGames)>= 2, name = constrName)
 myModel.update()
 
 #constraint 15: Each team must play at least 4 home/away games every 10 weeks
 for w in range(1,8): #adding 10 weeks goes beyond week 17
     for h in H:
-        constrName ='at_least_4homeaway_every10weeks_w%s_h%s' %(w,h)
+        constrName ='at_least_4home_every10weeks_w%s_h%s' %(w,h)
         myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for a in H[h] for w1 in range(w, w+11) for s in S[w1]) >= 4, name = constrName)
-myModel.update()    
+myModel.update()
+
+for w in range(1,8):
+    for a in A:
+        constrName ='at_least_4away_every10weeks_w%s_h%s' %(w,a)
+        myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w1] for h in A[a] for w1 in range(w, w+11) for s in S[w1]) +
+                                               quicksum(myGames[a,'BYE',s,w1] for w1 in range(w, w+11) for s in S[w1] if (a,'BYE',s,w1) in myGames) >= 4, name = constrName)
+myModel.update()  
+
+#Constraint 16:Superbowl champion from 2015 opens the season at home on Thursday night of Week 1
+for h in H:
+    for a in H[h]:
+        for s in S[1]:
+                if s[:4] == "THUN" and h!= 'DEN':
+                        myModel.remove(myGames[a,h,s,1])
+                        del myGames[a,h,s,1]
 
 #Objective 2: Minimize the number of division series that end in the first half of the season.  
 #OBJECTIVE FUNCTION##
-for key1 in DIVISION:
-    for key2 in DIVISION [key1]:
-       myModel.setObjective(quicksum(myGames[a,h,s,w,] for w in range(1,9) for h in T for a in H[h] for s in S[w] if h and a in key2),GRB.MINIMIZE)
-
-                                        
-
-
 
 myModel.update()
 myModel.optimize()
-#name="NFL_HW12"
-#myModel.write(name+'.lp')
+#    
+#dirtyHarris= {'Good':['DAL', 'GB', 'PHI','NE','DEN','PIT','SEA','CHI','NYG','SF','NO'],
+#              'Bad':['ARZ', 'ATL', 'WAS','MIN', 'PHI','OAK','CAR','MIA','IND','BUF','DET'],
+#              'Ugly':['NYJ', 'BAL','MIN','HOU','CIN','KC','CLE','TB','TEN','SD','LAR','JAC']}
+#
+#slotVal={}
+#for w in S:
+#    for s in S[w]:
+#        if 'SUNDH' in s:
+#            print 1,s
+#            slotVal[s]=6
+#        elif 'SUNN' in s:
+#            print 2,s
+#            slotVal[s]=5
+#        elif 'SUNE' or 'SUNL' or 'SAT' in s:
+#            print 3,s
+#            slotVal[s]=1    
+#        elif 'THUN_NBC' or 'THUN_CBS' in s:
+#            print 3,s
+#            slotVal[s]=4
+#        elif 'THUN_NFL' in s:
+#            slotVal[s]=2
+#        elif 'MON' in s:
+#            slotVal[s]=3
+#        else:
+#            slotVal[s]=0
+#            
+#
+#harrisModel=Model()
+#harrisGames={}
+#for amigo in T:
+#    for enemigo in H[amigo]:
+#        for w in range(1, 18):
+#            for s in S[w]:
+#                if amigo in dirtyHarris['Good'] or enemigo in dirtyHarris['Good']:
+#                    harrisGames[enemigo,amigo,s,w] = Harris.addVar(obj =4, vtype=GRB.BINARY, 
+#                                    name='games_%s_%s_%s_%s' % (enemigo,amigo,s,w))
+#                elif amigo in dirtyHarris['Bad'] or enemigo in dirtyHarris['Bad']:
+#                    harrisGames[enemigo,amigo,s,w] = Harris.addVar(obj =2, vtype=GRB.BINARY, 
+#                                    name='games_%s_%s_%s_%s' % (enemigo,amigo,s,w))
+#                elif amigo in dirtyHarris['Ugly'] or enemigo in dirtyHarris['Ugly']:
+#                    harrisGames[enemigo,amigo,s,w] = Harris.addVar(obj =1, vtype=GRB.BINARY, 
+#                                    name='games_%s_%s_%s_%s' % (enemigo,amigo,s,w))
+#harrisModel.update()                                    
+#                    
+#lenght = 0               
+#for sol in myGames:
+#...    if myGames[sol].x>0:
+#...         length =+1
